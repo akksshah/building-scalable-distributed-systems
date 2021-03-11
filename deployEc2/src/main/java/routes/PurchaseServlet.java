@@ -52,8 +52,10 @@ public class PurchaseServlet extends HttpServlet {
             // (and maybe also some value if input is valid)
             if (isPurchasePostUrlValid(urlParts)) {
                 response.setStatus(HttpServletResponse.SC_OK);
+                // Convert Json to the purchaseOrder object that we need to insert into the database
                 PurchaseOrder purchaseOrder = mapper.readValue(request.getReader().lines().collect(Collectors.joining()), PurchaseOrder.class);
                 try {
+                    // Save the object into the database
                     DAO.savePurchaseOrder(purchaseOrder.getItems().stream().map(item ->
                         new Purchase(
                             Integer.parseInt(urlParts[3]),

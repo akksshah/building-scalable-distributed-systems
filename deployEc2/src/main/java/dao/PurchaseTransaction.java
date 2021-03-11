@@ -11,8 +11,6 @@ public class PurchaseTransaction {
     private static final String INSERT_SQL_QUERY =
         "INSERT INTO purchase(store_id, customer_id, item_id, number_of_items, date) VALUES(?, ?, ?, ?, ?)";
     public void savePurchaseOrder(List<Purchase> order) {
-//        int maxRetries = 2;
-        // while (maxRetries-- > 0) {
             try(Connection connection = ConnectionUtility.getConnection()) {
 
                 var preparedStatement = connection.prepareStatement(INSERT_SQL_QUERY);
@@ -29,16 +27,16 @@ public class PurchaseTransaction {
                 connection.commit();
             } catch (SQLException e) {
                 e.printStackTrace();
-//                if (connection != null) {
-//                    try {
-//                        System.err.println("Rolling back");
-//                        connection.rollback();
-//                    } catch (SQLException sqlException) {
-//                        sqlException.printStackTrace();
-//                    }
-//                }
-//            }
+               if (connection != null) {
+                   try {
+                       System.err.println("Rolling back");
+                       connection.rollback();
+                   } catch (SQLException sqlException) {
+                       sqlException.printStackTrace();
+                   }
+               }
+               throw new RuntimeException("Failed to insert into the database");
+           }
         }
-        // throw new RuntimeException("Failed twice to insert into the database");
     }
 }
