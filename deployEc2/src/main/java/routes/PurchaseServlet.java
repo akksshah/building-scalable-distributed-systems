@@ -36,7 +36,6 @@ public class PurchaseServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        System.out.println("hi");
 
         ResponseMessage responseMessage = new ResponseMessage();
 
@@ -75,7 +74,6 @@ public class PurchaseServlet extends HttpServlet {
             }
             response.getWriter().print(GSON.toJson(responseMessage));
             response.getWriter().flush();
-            System.out.println(response);
         }
     }
 

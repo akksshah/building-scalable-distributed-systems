@@ -1,5 +1,7 @@
 package model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.sql.Date;
 
 import lombok.Data;
@@ -12,7 +14,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @ToString
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Purchase {
     private @NonNull Integer customerId;
     private @NonNull Integer storeId;

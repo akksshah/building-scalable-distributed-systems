@@ -11,11 +11,11 @@ public class PurchaseTransaction {
     private static final String INSERT_SQL_QUERY =
         "INSERT INTO purchase(store_id, customer_id, item_id, number_of_items, date) VALUES(?, ?, ?, ?, ?)";
     public void savePurchaseOrder(List<Purchase> order) {
-            try(Connection connection = ConnectionUtility.getConnection()) {
-
+        try (Connection connection = ConnectionUtility.getConnection()) {
+            try {
                 var preparedStatement = connection.prepareStatement(INSERT_SQL_QUERY);
 
-                for (Purchase purchase: order) {
+                for (Purchase purchase : order) {
                     preparedStatement.setInt(1, purchase.getStoreId());
                     preparedStatement.setInt(2, purchase.getCustomerId());
                     preparedStatement.setString(3, purchase.getItemId());
@@ -26,17 +26,14 @@ public class PurchaseTransaction {
                 preparedStatement.executeBatch();
                 connection.commit();
             } catch (SQLException e) {
-                e.printStackTrace();
-               if (connection != null) {
-                   try {
-                       System.err.println("Rolling back");
-                       connection.rollback();
-                   } catch (SQLException sqlException) {
-                       sqlException.printStackTrace();
-                   }
-               }
-               throw new RuntimeException("Failed to insert into the database");
-           }
+                System.err.println("Rolling back");
+                connection.rollback();
+                throw new RuntimeException("Roll Backed");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.println("Failed to Roll back");
+            throw new RuntimeException("Failed to insert/rollback into the database");
         }
     }
 }

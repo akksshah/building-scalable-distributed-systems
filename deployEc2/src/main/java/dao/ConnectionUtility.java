@@ -11,10 +11,10 @@ public class ConnectionUtility {
     private static final HikariDataSource hikariDataSource;
 
     static {
-        config.setAutoCommit(true);
+        config.setAutoCommit(false);
         config.setDriverClassName("com.mysql.cj.jdbc.Driver");
         config.setJdbcUrl("jdbc:mysql://purchases.cvst2wuziexb.us-east-1.rds.amazonaws.com/purchases");
-        config.setMaximumPoolSize(60);
+        config.setMaximumPoolSize(66);
         config.setUsername("admin");
         config.setPassword("akksshah");
         config.addDataSourceProperty("cachePrepStmts", "true");
