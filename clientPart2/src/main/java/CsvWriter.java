@@ -10,14 +10,19 @@ import java.util.TimeZone;
 import lombok.var;
 
 public final class CsvWriter {
+    private static final boolean MAKE_CSV = false;
     private static final DateFormat FORMATTER = new SimpleDateFormat("mm:ss.SSS");
     static {
         FORMATTER.setTimeZone(TimeZone.getTimeZone("EST"));
     }
     public static void writeToCsv(String fileName, List<RequestTracker> requests) throws FileNotFoundException {
-        var csv = new File(fileName);
-        var writer = new PrintWriter(csv);
-        requests.stream().map(CsvWriter::convertToCsv).forEach(writer::println);
+        if (MAKE_CSV) {
+            var csv = new File(fileName);
+            var writer = new PrintWriter(csv);
+            requests.stream().map(CsvWriter::convertToCsv).forEach(writer::println);
+        } else {
+            System.out.println("CSV was not produced");
+        }
     }
 
     private static String convertToCsv(RequestTracker request) {

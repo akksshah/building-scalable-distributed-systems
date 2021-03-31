@@ -13,6 +13,7 @@ import shared.DateBuilder;
 @ToString
 public class ConfigParameter {
     @NonNull
+    @Setter
     private Integer maxStores;
 
     private Integer numberOfCustomersPerStore = 1000;

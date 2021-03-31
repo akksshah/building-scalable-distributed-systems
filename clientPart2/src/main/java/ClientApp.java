@@ -6,7 +6,6 @@ import lombok.var;
 
 public class ClientApp {
     public static void main(String[] args) throws IOException {
-        // System.out.println("Starting Application at: " + (LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-d HH:mm:ss.SSS"))));
         var properties = new Properties();
         var propertiesFileName = "config.properties";
         var inputStream = ClientApp.class.getClassLoader().getResourceAsStream(propertiesFileName);
@@ -16,6 +15,12 @@ public class ClientApp {
             properties.load(inputStream);
         }
         var config = ConfigParameter.getConfig(properties);
+        System.err.println("===============================================================================");
+        config.setMaxStores(256);
         new StoreFactory(config).execute();
+        System.err.println("===============================================================================");
+        config.setMaxStores(512);
+        new StoreFactory(config).execute();
+        System.err.println("===============================================================================");
     }
 }
