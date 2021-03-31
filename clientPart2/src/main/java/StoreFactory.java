@@ -10,6 +10,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
+import lombok.var;
+
 public class StoreFactory {
     private final ConfigParameter config;
     private final RequestCounter counter;
@@ -55,15 +57,17 @@ public class StoreFactory {
             worker_pool.shutdownNow();
         }
         var endTime = System.currentTimeMillis();
+        System.out.println("********** Statistics **********");
+        System.out.println("Total number of stores used for simulation: ");
         System.out.println("Total request sent: " + counter.getTotalRequestSent());
         System.out.println("Total request successful: " + counter.getNumberOfSuccessfulRequest());
         System.out.println("Total unsuccessful request: " + counter.getNumberOfFailedRequest());
-        System.out.println("Total wall time: " + (endTime - startTime) + "ms");
+        System.out.println("Total wall time: " + ((endTime - startTime) / 1000) + "s");
         System.out.println("Throughput: " + (((double) counter.getTotalRequestSent()) / ((endTime - startTime) / 1000)));
-        System.out.println("Mean response time: " + MetricsGenerator.getMeanResponseTime(requestsTracker));
-        System.out.println("Median response time: " + MetricsGenerator.getMedianResponseTime(requestsTracker));
-        System.out.println("p99 (99 percentile): " + MetricsGenerator.getPercentileResponseTime(99, requestsTracker));
-        System.out.println("Max response time: " + MetricsGenerator.getMaxResponseTime(requestsTracker));
+        System.out.println("Mean response time: " + MetricsGenerator.getMeanResponseTime(requestsTracker) + "ms");
+        System.out.println("Median response time: " + MetricsGenerator.getMedianResponseTime(requestsTracker) + "ms");
+        System.out.println("p99 (99 percentile): " + MetricsGenerator.getPercentileResponseTime(99, requestsTracker) + "ms");
+        System.out.println("Max response time: " + MetricsGenerator.getMaxResponseTime(requestsTracker) + "ms");
         try {
             CsvWriter.writeToCsv(config.getMaxStores() + "Threads.csv", requestsTracker);
         } catch (FileNotFoundException e) {

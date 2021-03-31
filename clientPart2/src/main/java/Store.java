@@ -7,6 +7,7 @@ import io.swagger.client.ApiException;
 import io.swagger.client.api.PurchaseApi;
 import io.swagger.client.model.Purchase;
 import io.swagger.client.model.PurchaseItems;
+import lombok.var;
 
 public class Store implements Runnable {
     private final String serverIpAddress;

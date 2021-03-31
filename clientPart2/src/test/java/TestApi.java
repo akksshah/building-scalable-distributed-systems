@@ -6,9 +6,11 @@ import io.swagger.client.ApiException;
 import io.swagger.client.api.PurchaseApi;
 import io.swagger.client.model.Purchase;
 import io.swagger.client.model.PurchaseItems;
+import lombok.var;
 
 public class TestApi {
-     private static final String serverIpAddress = "bsds-1992801789.us-east-1.elb.amazonaws.com";
+     private static final String serverIpAddress
+             = "52.87.235.220:8080";
 //private static final String serverIpAddress = "3.91.241.111";
 //    private static final String serverIpAddress = "localhost";
     private static final String serverPort = "8080";
@@ -54,9 +56,10 @@ public class TestApi {
         }
     }
     private static String getUrl() {
-        return serverIpAddress.equals("localhost")
-                   ? "http://localhost:8080/deployEc2_war_exploded/"
-                   : "http://" + serverIpAddress + "/deployEc2/";
+        return "http://52.87.235.220:8080/deployEc2/";
+//        return serverIpAddress.equals("localhost")
+//                   ? "http://localhost:8080/deployEc2_war_exploded/"
+//                   : "http://" + serverIpAddress + "/deployEc2/";
     }
 
     private static PurchaseApi getApi() {

@@ -2,6 +2,8 @@ import java.util.List;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
+import lombok.var;
+
 public final class MetricsGenerator {
     public static double getMeanResponseTime(List<RequestTracker> requests) {
         return requests.stream().mapToDouble(RequestTracker::getLatency).sum() / requests.size();

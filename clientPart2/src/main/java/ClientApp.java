@@ -2,6 +2,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
+import lombok.var;
+
 public class ClientApp {
     public static void main(String[] args) throws IOException {
         // System.out.println("Starting Application at: " + (LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-d HH:mm:ss.SSS"))));
