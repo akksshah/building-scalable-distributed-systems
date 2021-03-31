@@ -16,11 +16,13 @@ public class StoreFactory {
     private final ConfigParameter config;
     private final RequestCounter counter;
     private final List<RequestTracker> requestsTracker;
+    private final int hoursOpen;
 
     public StoreFactory(ConfigParameter configParameter) {
-        this.config = configParameter;
-        this.counter = new RequestCounter();
-        this.requestsTracker = Collections.synchronizedList(new ArrayList<>());
+        config = configParameter;
+        counter = new RequestCounter();
+        requestsTracker = Collections.synchronizedList(new ArrayList<>());
+        hoursOpen = 9;
     }
 
     public void execute() {
@@ -32,19 +34,19 @@ public class StoreFactory {
         var startTime = System.currentTimeMillis();
         try {
             System.out.println("Launching stores for eastern time");
-            launchStores(worker_pool, numberOfThreadsRequiredForPhaseOne, 9, 3);
+            launchStores(worker_pool, numberOfThreadsRequiredForPhaseOne, hoursOpen, 3);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         try {
             System.out.println("Launching stores for central time");
-            launchStores(worker_pool, numberOfThreadsRequiredForPhaseTwo, 9, 2);
+            launchStores(worker_pool, numberOfThreadsRequiredForPhaseTwo, hoursOpen, 2);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         try {
             System.out.println("Launching stores for pacific time");
-            launchStores(worker_pool, numberOfThreadsRequiredForPhaseThree, 9, 9);
+            launchStores(worker_pool, numberOfThreadsRequiredForPhaseThree, hoursOpen, 9);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -80,7 +82,7 @@ public class StoreFactory {
         var latch = new CountDownLatch(numberOfThreadsToExecute * countDownHours);
         // System.out.println("CountDown for this phase: " + latch.getCount());
         IntStream.range(0, numberOfThreadsToExecute)
-            .mapToObj(i -> new Store(config.getServerIpAddress(), config.getServerPort(), config.getNumPurchases(), 1
+            .mapToObj(i -> new Store(config.getServerIpAddress(), config.getNumPurchases(), 1
             , i + 1, config.getNumberOfCustomersPerStore(), config.getMaximumItemId(), hoursOpen, counter, latch, requestsTracker))
             .forEach(workers::submit);
         latch.await();

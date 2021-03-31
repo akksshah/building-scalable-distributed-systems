@@ -26,7 +26,7 @@ public final class CsvWriter {
     }
 
     private static String convertToCsv(RequestTracker request) {
-        return request.getStartTime() + "," + request.getEndTime() + "," + request.getLatency() + "," + request.getRequestType().name() + "," + (request.getResponseCode() == null ? "API_EXCEPTION" : request.getResponseCode());
+        return convertFrom(request.getStartTime()) + "," + convertFrom(request.getEndTime()) + "," + request.getLatency() + "," + request.getRequestType().name() + "," + (request.getResponseCode() == null ? "API_EXCEPTION" : request.getResponseCode());
     }
 
     private static String convertFrom(long ms) {

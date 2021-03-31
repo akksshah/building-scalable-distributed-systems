@@ -11,7 +11,6 @@ import lombok.var;
 
 public class Store implements Runnable {
     private final String serverIpAddress;
-    private final String serverPort;
     private PurchaseApi api;
     private final RequestCounter counter;
     private final CountDownLatch latch;
@@ -23,11 +22,10 @@ public class Store implements Runnable {
     private final int maxItemId;
     private final List<RequestTracker> requestTracker;
 
-    public Store(String serverIpAddress, String serverPort, int numPurchases, int numberOfItemsToPurchasePerOrder, int storeId,
+    public Store(String serverIpAddress, int numPurchases, int numberOfItemsToPurchasePerOrder, int storeId,
                  int numberOfCustomerPerStore, int maxItemId, int numberOfHoursOperational, RequestCounter counter, CountDownLatch latch,
                  List<RequestTracker> requestTracker) {
         this.serverIpAddress = serverIpAddress;
-        this.serverPort = serverPort;
         this.numPurchases = numPurchases;
         this.numberOfItemsToPurchasePerOrder = numberOfItemsToPurchasePerOrder;
         this.storeId = storeId;
