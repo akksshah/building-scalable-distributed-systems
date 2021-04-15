@@ -3,15 +3,15 @@ package rabbitMqTutorial;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.DeliverCallback;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
+@Deprecated
 public class Receive {
-    private static final String QUEUE = "hello";
-    private static final String EXCHANGE_NAME = "logs";
+    private static final String QUEUE = "hello1";
+    private static final String EXCHANGE_NAME = "purchase_exchange";
 
     private static void consumeMessageFromRabbitMq() throws IOException, TimeoutException {
         ConnectionFactory factory = new ConnectionFactory();
@@ -25,6 +25,7 @@ public class Receive {
         channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
 //        String queueName = channel.queueDeclare().getQueue();
         String queueName = QUEUE;
+
         channel.queueDeclare(QUEUE, false, false, false, null);
         System.out.println("queueName: " + queueName);
         channel.queueBind(queueName, EXCHANGE_NAME, "");

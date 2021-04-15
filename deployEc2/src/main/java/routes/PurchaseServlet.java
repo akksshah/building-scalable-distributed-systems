@@ -1,8 +1,9 @@
 package routes;
 
-import com.google.gson.Gson;
+import com.rabbitmq.client.Channel;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 import java.io.IOException;
 import java.util.stream.Collectors;
@@ -13,19 +14,36 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import dao.PurchaseTransaction;
-import model.Purchase;
+import rabbitMqDao.QueuePurchase;
+import rabbitMqDao.RabbitMqChannelFactory;
+import rabbitMqDao.RabbitMqPublisherUtil;
+import rabbitMqDao.RbmqChannelPool;
 import util.DateBuilder;
+import util.Order;
 import util.PurchaseOrder;
+import util.PurchasedItems;
 import util.ResponseMessage;
+import util.Utility;
 
 @WebServlet(name = "routes.PurchaseServlet", value = "/routes.PurchaseServlet")
 public class PurchaseServlet extends HttpServlet {
-    private final static Gson GSON = new Gson();
     private final static String DIGIT_REGEX = "\\d+";
-    private static final PurchaseTransaction DAO = new PurchaseTransaction();
-    private static final ObjectMapper mapper = new ObjectMapper();
-    private final boolean DEBUG = true;
+    private static final GenericObjectPoolConfig<Channel> defaultConfig;
+    private RbmqChannelPool channelPool;
+
+    static {
+        defaultConfig = new GenericObjectPoolConfig<>();
+        defaultConfig.setMaxTotal(256);
+        defaultConfig.setMinIdle(128);
+        defaultConfig.setMaxIdle(256);
+        defaultConfig.setBlockWhenExhausted(false);
+    }
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        channelPool = new RbmqChannelPool(new GenericObjectPool<>(new RabbitMqChannelFactory(RabbitMqPublisherUtil.getRabbitMqConnection()), defaultConfig));
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
@@ -52,27 +70,29 @@ public class PurchaseServlet extends HttpServlet {
             if (isPurchasePostUrlValid(urlParts)) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 // Convert Json to the purchaseOrder object that we need to insert into the database
-                PurchaseOrder purchaseOrder = mapper.readValue(request.getReader().lines().collect(Collectors.joining()), PurchaseOrder.class);
+                PurchaseOrder purchaseOrder = Utility.getMapper().readValue(request.getReader().lines().collect(Collectors.joining()), PurchaseOrder.class);
+                System.out.println(Utility.getMapper().writeValueAsString(purchaseOrder));
                 try {
-                    // Save the object into the database
-                    DAO.savePurchaseOrder(purchaseOrder.getItems().stream().map(item ->
-                        new Purchase(
-                            Integer.parseInt(urlParts[3]),
-                            Integer.parseInt(urlParts[1]),
-                            DateBuilder.getDate(urlParts[5]),
-                            item.getNumberOfItems(),
-                            item.getItemId())).collect(Collectors.toList()));
+                    // Validate the json
+                    //PurchaseOrder purchaseOrder = Utility.getMapper().readValue(json,
+//                                                                                PurchaseOrder.class);
+                    Order order =
+                            new Order(purchaseOrder.getItems().stream().map(i -> new PurchasedItems(i.getItemId(), i.getNumberOfItems())).collect(Collectors.toList()),
+                                            Integer.parseInt(urlParts[3]),
+                                            Integer.parseInt(urlParts[1]),
+                                            DateBuilder.getDate(urlParts[5]));
+                    // Push into the queue
+                    new QueuePurchase(order, channelPool).queuePurchase();
                     responseMessage.setMessage("It works! with save");
                 } catch (Exception e) {
                     responseMessage.setMessage("ERROR: Save failed: " + e.getMessage());
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 }
-
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 responseMessage.setError("Url not valid");
             }
-            response.getWriter().print(GSON.toJson(responseMessage));
+            response.getWriter().print(Utility.getMapper().writeValueAsString(responseMessage));
             response.getWriter().flush();
         }
     }

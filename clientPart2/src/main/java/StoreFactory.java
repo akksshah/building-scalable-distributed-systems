@@ -26,7 +26,7 @@ public class StoreFactory {
     }
 
     public void execute() {
-        System.out.println("Starting Execution at: " + (LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-d HH:mm:ss.SSS"))));
+        System.out.println("Starting Execution at: " + (LocalDateTime.now().minusHours(4).format(DateTimeFormatter.ofPattern("yyyy-MM-d HH:mm:ss.SSS"))));
         var numberOfThreadsRequiredForPhaseOne = config.getMaxStores() / 4;
         var numberOfThreadsRequiredForPhaseTwo = config.getMaxStores() / 4;
         var numberOfThreadsRequiredForPhaseThree = config.getMaxStores() - numberOfThreadsRequiredForPhaseOne - numberOfThreadsRequiredForPhaseTwo;
@@ -75,7 +75,7 @@ public class StoreFactory {
         } catch (FileNotFoundException e) {
             System.err.println("Could not save the request data to Csv");
         }
-        System.out.println("Ending execution at: " + (LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-d HH:mm:ss.SSS"))));
+        System.out.println("Ending execution at: " + (LocalDateTime.now().minusHours(4).format(DateTimeFormatter.ofPattern("yyyy-MM-d HH:mm:ss.SSS"))));
     }
 
     private void launchStores(ExecutorService workers, int numberOfThreadsToExecute, int hoursOpen, int countDownHours) throws InterruptedException {

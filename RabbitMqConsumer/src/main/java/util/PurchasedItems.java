@@ -1,21 +1,17 @@
-package model;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+package util;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import util.PurchaseDeserializer;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @ToString
-@JsonDeserialize(using = PurchaseDeserializer.class)
-public class PurchaseItems {
+public class PurchasedItems {
     private String itemId;
     private Integer numberOfItems;
 }
