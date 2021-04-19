@@ -73,9 +73,6 @@ public class PurchaseServlet extends HttpServlet {
                 PurchaseOrder purchaseOrder = Utility.getMapper().readValue(request.getReader().lines().collect(Collectors.joining()), PurchaseOrder.class);
                 System.out.println(Utility.getMapper().writeValueAsString(purchaseOrder));
                 try {
-                    // Validate the json
-                    //PurchaseOrder purchaseOrder = Utility.getMapper().readValue(json,
-//                                                                                PurchaseOrder.class);
                     Order order =
                             new Order(purchaseOrder.getItems().stream().map(i -> new PurchasedItems(i.getItemId(), i.getNumberOfItems())).collect(Collectors.toList()),
                                             Integer.parseInt(urlParts[3]),
