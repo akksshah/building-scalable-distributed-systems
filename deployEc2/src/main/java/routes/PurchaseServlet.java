@@ -42,7 +42,8 @@ public class PurchaseServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        channelPool = new RbmqChannelPool(new GenericObjectPool<>(new RabbitMqChannelFactory(RabbitMqPublisherUtil.getRabbitMqConnection()), defaultConfig));
+        channelPool =
+                new RbmqChannelPool(new GenericObjectPool<>(new RabbitMqChannelFactory(RabbitMqPublisherUtil.getRabbitMqConnection()), defaultConfig));
     }
 
     @Override
@@ -70,14 +71,20 @@ public class PurchaseServlet extends HttpServlet {
             if (isPurchasePostUrlValid(urlParts)) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 // Convert Json to the purchaseOrder object that we need to insert into the database
-                PurchaseOrder purchaseOrder = Utility.getMapper().readValue(request.getReader().lines().collect(Collectors.joining()), PurchaseOrder.class);
+                PurchaseOrder purchaseOrder =
+                        Utility.getMapper().readValue(request.getReader().lines().collect(Collectors.joining()), PurchaseOrder.class);
                 System.out.println(Utility.getMapper().writeValueAsString(purchaseOrder));
                 try {
                     Order order =
-                            new Order(purchaseOrder.getItems().stream().map(i -> new PurchasedItems(i.getItemId(), i.getNumberOfItems())).collect(Collectors.toList()),
-                                            Integer.parseInt(urlParts[3]),
-                                            Integer.parseInt(urlParts[1]),
-                                            DateBuilder.getDate(urlParts[5]));
+                            new Order(purchaseOrder
+                                              .getItems()
+                                              .stream()
+                                              .map(i ->
+                                                           new PurchasedItems(i.getItemId(),
+                                                                              i.getNumberOfItems())).collect(Collectors.toList()),
+                                      Integer.parseInt(urlParts[3]),
+                                      Integer.parseInt(urlParts[1]),
+                                      DateBuilder.getDate(urlParts[5]));
                     // Push into the queue
                     new QueuePurchase(order, channelPool).queuePurchase();
                     responseMessage.setMessage("It works! with save");
