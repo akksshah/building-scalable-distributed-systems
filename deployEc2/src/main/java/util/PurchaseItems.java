@@ -1,4 +1,4 @@
-package model;
+package util;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import util.PurchaseDeserializer;
 
 @AllArgsConstructor
 @NoArgsConstructor

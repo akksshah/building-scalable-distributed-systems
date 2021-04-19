@@ -43,7 +43,7 @@ public class TestApi {
 
     private static String getUrl() {
         return serverIpAddress.equals("localhost")
-               ? "http://localhost:8080/deployEc2_war_exploded/"
+               ? "http://localhost:8080/deployEc2_exploded/"
                : "http://" + serverIpAddress + "/deployEc2/";
     }
 

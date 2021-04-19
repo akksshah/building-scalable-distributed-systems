@@ -8,8 +8,6 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 import java.io.IOException;
 
-import model.PurchaseItems;
-
 public class PurchaseDeserializer extends StdDeserializer<PurchaseItems> {
 
     @SuppressWarnings("unused")

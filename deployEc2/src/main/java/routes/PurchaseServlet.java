@@ -1,9 +1,8 @@
 package routes;
 
-import com.rabbitmq.client.Channel;
-
-import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 
 import java.io.IOException;
 import java.util.stream.Collectors;
@@ -14,12 +13,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import rabbitMqDao.QueuePurchase;
-import rabbitMqDao.RabbitMqChannelFactory;
-import rabbitMqDao.RabbitMqPublisherUtil;
-import rabbitMqDao.RbmqChannelPool;
+import model.Order;
 import util.DateBuilder;
-import util.Order;
 import util.PurchaseOrder;
 import util.PurchasedItems;
 import util.ResponseMessage;
@@ -28,23 +23,8 @@ import util.Utility;
 @WebServlet(name = "routes.PurchaseServlet", value = "/routes.PurchaseServlet")
 public class PurchaseServlet extends HttpServlet {
     private final static String DIGIT_REGEX = "\\d+";
-    private static final GenericObjectPoolConfig<Channel> defaultConfig;
-    private RbmqChannelPool channelPool;
-
-    static {
-        defaultConfig = new GenericObjectPoolConfig<>();
-        defaultConfig.setMaxTotal(256);
-        defaultConfig.setMinIdle(128);
-        defaultConfig.setMaxIdle(256);
-        defaultConfig.setBlockWhenExhausted(false);
-    }
-
-    @Override
-    public void init() throws ServletException {
-        super.init();
-        channelPool =
-                new RbmqChannelPool(new GenericObjectPool<>(new RabbitMqChannelFactory(RabbitMqPublisherUtil.getRabbitMqConnection()), defaultConfig));
-    }
+    public static DynamoDBMapper mapper =
+            new DynamoDBMapper(AmazonDynamoDBClient.builder().withRegion(Regions.US_EAST_1).build());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
@@ -75,18 +55,17 @@ public class PurchaseServlet extends HttpServlet {
                         Utility.getMapper().readValue(request.getReader().lines().collect(Collectors.joining()), PurchaseOrder.class);
                 System.out.println(Utility.getMapper().writeValueAsString(purchaseOrder));
                 try {
-                    Order order =
-                            new Order(purchaseOrder
-                                              .getItems()
-                                              .stream()
-                                              .map(i ->
-                                                           new PurchasedItems(i.getItemId(),
-                                                                              i.getNumberOfItems())).collect(Collectors.toList()),
-                                      Integer.parseInt(urlParts[3]),
-                                      Integer.parseInt(urlParts[1]),
-                                      DateBuilder.getDate(urlParts[5]));
-                    // Push into the queue
-                    new QueuePurchase(order, channelPool).queuePurchase();
+                    Order order = new Order();
+                    order.setItems(purchaseOrder
+                                           .getItems()
+                                           .stream()
+                                           .map(i ->
+                                                        new PurchasedItems(i.getItemId(),
+                                                                           i.getNumberOfItems())).collect(Collectors.toList()));
+                    order.setCustomerId(Integer.parseInt(urlParts[3]));
+                    order.setStoreId(Integer.parseInt(urlParts[1]));
+                    order.setDate(DateBuilder.getDate(urlParts[5]));
+                    mapper.save(order);
                     responseMessage.setMessage("It works! with save");
                 } catch (Exception e) {
                     responseMessage.setMessage("ERROR: Save failed: " + e.getMessage());
