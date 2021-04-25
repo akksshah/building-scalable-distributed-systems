@@ -10,7 +10,7 @@ import java.util.TimeZone;
 import lombok.var;
 
 public final class CsvWriter {
-    private static final boolean MAKE_CSV = false;
+    private static final boolean MAKE_CSV = true;
     private static final DateFormat FORMATTER = new SimpleDateFormat("mm:ss.SSS");
     static {
         FORMATTER.setTimeZone(TimeZone.getTimeZone("EST"));

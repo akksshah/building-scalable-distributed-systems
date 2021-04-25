@@ -65,7 +65,16 @@ public class PurchaseServlet extends HttpServlet {
                     order.setCustomerId(Integer.parseInt(urlParts[3]));
                     order.setStoreId(Integer.parseInt(urlParts[1]));
                     order.setDate(DateBuilder.getDate(urlParts[5]));
-                    mapper.save(order);
+                    int count = 1;
+                    while (true) {
+                        try {
+                            mapper.save(order);
+                            if (count != 1) {
+                                System.err.println("Request succeeded after tries: " + count);
+                            }
+                            break;
+                        } catch (Exception ignored) { count++; }
+                    }
                     responseMessage.setMessage("It works! with save");
                 } catch (Exception e) {
                     responseMessage.setMessage("ERROR: Save failed: " + e.getMessage());
