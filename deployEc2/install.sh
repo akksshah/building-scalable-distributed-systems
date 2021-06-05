@@ -1,4 +1,6 @@
-for (( i = 1; i < 5; i++ )); do
+echo "How many servers do you wish to deploy"
+read -r servers
+for (( i = 1; i < "$servers"; i++ )); do
     echo "Enter Ip Address for $i"
     read -r ip
     ssh -i "../../aakash6650.pem" ec2-user@"$ip"
